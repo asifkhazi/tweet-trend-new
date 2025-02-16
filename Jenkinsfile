@@ -22,7 +22,11 @@ pipeline {
             }
             steps {
                 withSonarQubeEnv('sonarqube-server') { // If you have configured more than one global server connection, you can specify its name
-                    sh "${scannerHome}/bin/sonar-scanner -X -Dsonar.verbose=true"
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=khazi-key_tweet-trend \
+              -Dsonar.organization=khazi-key \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=https://sonarcloud.io \
+              -X"
                 }
             }
         }
