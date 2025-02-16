@@ -12,7 +12,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                sh 'mvn clean deploy -Dmaven.test.skip=true'
+                sh 'mvn clean package -Dmaven.test.skip=true'
             }
         }
 
@@ -23,10 +23,19 @@ pipeline {
             steps {
                 withSonarQubeEnv('sonarqube-server') { // If you have configured more than one global server connection, you can specify its name
                     sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=khazi-key_tweet-trend \
-              -Dsonar.organization=khazi-key \
-              -Dsonar.sources=. \
-              -Dsonar.host.url=https://sonarcloud.io \
-              -X"
+                    -Dsonar.organization=khazi-key \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=https://sonarcloud.io \
+                    -X"
+                }
+            }
+        }
+
+        stage("Quality Gate"){
+            timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+                if (qg.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
                 }
             }
         }
