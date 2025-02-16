@@ -12,7 +12,7 @@ pipeline {
 
         stage('Maven Build') {
             steps {
-                sh 'mvn clean install -Dmaven.test.skip=true'
+                sh 'mvn clean compile -Dmaven.test.skip=true'
             }
         }
 
